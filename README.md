@@ -64,6 +64,18 @@ This is the command-line I generally use on Linux:
 -Dprism.dirtyopts=false -Dprism.forceUploadingPainter=true -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC
 ```
 
+Vertex Shader Error
+-------------------
+
+Open Source nouveau drivers work, but using the nvidia drivers will result in an error pertaining to vertex shader
+creation.
+
+This can be resolved with the nvidia drivers by disabling hardware rendering, which of course has its own implications:
+
+```
+-Dprism.order=sw
+```
+
 Screenshot
 ----------
 
