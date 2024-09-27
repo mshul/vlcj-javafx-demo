@@ -80,6 +80,52 @@ public class VlcjJavaFxApplication extends Application {
 
         root.setCenter(videoImageView);
 
+        // Create the menu bar
+        MenuBar menuBar = new MenuBar();
+        Menu fileMenu = new Menu("File");
+        MenuItem openMenuItem = new MenuItem("Open Media File");
+        openMenuItem.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+            );
+            File selectedFile = fileChooser.showOpenDialog(primaryStage);
+            if (selectedFile != null) {
+                embeddedMediaPlayer.media().play(selectedFile.getAbsolutePath());
+            }
+        });
+        fileMenu.getItems().add(openMenuItem);
+        menuBar.getMenus().add(fileMenu);
+
+        // Set the menu bar at the top of the BorderPane
+        root.setTop(menuBar);
+
+        // Load icons from resources
+        Image playIcon = new Image(getClass().getResourceAsStream("/resources/play.png"));
+        Image pauseIcon = new Image(getClass().getResourceAsStream("/resources/pause.png"));
+        Image stopIcon = new Image(getClass().getResourceAsStream("/resources/stop.png"));
+
+        // Create playback controls
+        Button playButton = new Button();
+        playButton.setGraphic(new ImageView(playIcon));
+        playButton.setOnAction(event -> embeddedMediaPlayer.controls().play());
+
+        Button pauseButton = new Button();
+        pauseButton.setGraphic(new ImageView(pauseIcon));
+        pauseButton.setOnAction(event -> embeddedMediaPlayer.controls().pause());
+
+        Button stopButton = new Button();
+        stopButton.setGraphic(new ImageView(stopIcon));
+        stopButton.setOnAction(event -> embeddedMediaPlayer.controls().stop());
+
+        HBox controlBox = new HBox(10, playButton, pauseButton, stopButton);
+        controlBox.setAlignment(Pos.CENTER);
+        controlBox.setPadding(new Insets(10));
+
+        // Set the control box at the bottom of the BorderPane
+        root.setBottom(controlBox);
+
         Scene scene = new Scene(root, 1200, 675, Color.BLACK);
         primaryStage.setTitle("vlcj JavaFX");
         primaryStage.setScene(scene);
