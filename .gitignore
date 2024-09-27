@@ -8,3 +8,6 @@
 .project
 .classpath
 .settings
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
