@@ -144,6 +144,9 @@
                 <excludes>
                     <exclude>.gitignore</exclude>
                 </excludes>
+                <includes>
+                <include>**/*.png</include>
+            </includes>
             </resource>
         </resources>
     </build>

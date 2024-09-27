@@ -1,11 +1,22 @@
 package uk.co.caprica.vlcj.javafx.demo;
 
 import javafx.application.Application;
-import javafx.stage.FileChooser;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
@@ -13,17 +24,12 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
-import java.util.List;
+import java.io.File;
 
-/**
- *
- */
 public class VlcjJavaFxApplication extends Application {
 
     private final MediaPlayerFactory mediaPlayerFactory;
-
     private final EmbeddedMediaPlayer embeddedMediaPlayer;
-
     private ImageView videoImageView;
 
     public VlcjJavaFxApplication() {
@@ -58,12 +64,6 @@ public class VlcjJavaFxApplication extends Application {
 
     @Override
     public final void start(Stage primaryStage) throws Exception {
-        List<String> params = getParameters().getRaw();
-       /*  if (params.size() != 1) {
-            System.out.println("Specify a single MRL");
-            System.exit(-1);
-        }
- */
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: black;");
 
@@ -101,40 +101,68 @@ public class VlcjJavaFxApplication extends Application {
         // Set the menu bar at the top of the BorderPane
         root.setTop(menuBar);
 
-        // Load icons from resources
-        Image playIcon = new Image(getClass().getResourceAsStream("/resources/play.png"));
-        Image pauseIcon = new Image(getClass().getResourceAsStream("/resources/pause.png"));
-        Image stopIcon = new Image(getClass().getResourceAsStream("/resources/stop.png"));
+          // Load icons from resources
+          Image playIcon = new Image(getClass().getResourceAsStream("/icons/buttons/play.png"));
+          Image pauseIcon = new Image(getClass().getResourceAsStream("/icons/buttons/pause.png"));
+          Image stopIcon = new Image(getClass().getResourceAsStream("/icons/buttons/stop.png"));
+  // Debugging: Check if images are loaded
+  System.out.println("Play Icon: " + (playIcon != null));
+  System.out.println("Pause Icon: " + (pauseIcon != null));
+  System.out.println("Stop Icon: " + (stopIcon != null));
 
-        // Create playback controls
-        Button playButton = new Button();
-        playButton.setGraphic(new ImageView(playIcon));
-        playButton.setOnAction(event -> embeddedMediaPlayer.controls().play());
+  // Create playback controls with ImageView
+  ImageView playImageView = new ImageView(playIcon);
+  playImageView.setFitWidth(30);
+  playImageView.setFitHeight(30);
+  playImageView.setOpacity(0.7); // Set opacity for transparency
+  playImageView.setOnMouseClicked(event -> embeddedMediaPlayer.controls().play());
 
-        Button pauseButton = new Button();
-        pauseButton.setGraphic(new ImageView(pauseIcon));
-        pauseButton.setOnAction(event -> embeddedMediaPlayer.controls().pause());
+  ImageView pauseImageView = new ImageView(pauseIcon);
+  pauseImageView.setFitWidth(30);
+  pauseImageView.setFitHeight(30);
+  pauseImageView.setOpacity(0.7); // Set opacity for transparency
+  pauseImageView.setOnMouseClicked(event -> embeddedMediaPlayer.controls().pause());
 
-        Button stopButton = new Button();
-        stopButton.setGraphic(new ImageView(stopIcon));
-        stopButton.setOnAction(event -> embeddedMediaPlayer.controls().stop());
+  ImageView stopImageView = new ImageView(stopIcon);
+  stopImageView.setFitWidth(30);
+  stopImageView.setFitHeight(30);
+  stopImageView.setOpacity(0.7); // Set opacity for transparency
+  stopImageView.setOnMouseClicked(event -> embeddedMediaPlayer.controls().stop());
 
-        HBox controlBox = new HBox(10, playButton, pauseButton, stopButton);
-        controlBox.setAlignment(Pos.CENTER);
-        controlBox.setPadding(new Insets(10));
+  HBox controlBox = new HBox(10, playImageView, pauseImageView, stopImageView);
+  controlBox.setAlignment(Pos.CENTER);
+  controlBox.setPadding(new Insets(10));
+  controlBox.setStyle("-fx-background-color: transparent;"); // Set background color to transparent
+  controlBox.setVisible(false); // Initially hide the control box
 
-        // Set the control box at the bottom of the BorderPane
-        root.setBottom(controlBox);
+  // Debugging: Check if controlBox is added
+  System.out.println("ControlBox added: " + (controlBox != null));
 
-        Scene scene = new Scene(root, 1200, 675, Color.BLACK);
-        primaryStage.setTitle("vlcj JavaFX");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+  // Create a VBox to stack the video and controls vertically
+    VBox vbox = new VBox();
+    vbox.getChildren().addAll(videoImageView, controlBox);
+    VBox.setVgrow(videoImageView, Priority.ALWAYS); // Allow video to grow and take available space
 
-        //embeddedMediaPlayer.media().play(params.get(0));
-        embeddedMediaPlayer.media().play( "/Users/matt/dev/vid/my-app/Peggy-O 70s JG Lead Lesson.mp4");
+    // Set the VBox as the center of the BorderPane
+    root.setCenter(vbox);
 
-        //embeddedMediaPlayer.controls().setPosition(0.4f);
+    // Show controls on mouse hover
+    vbox.setOnMouseEntered(event -> controlBox.setVisible(true));
+    vbox.setOnMouseExited(event -> controlBox.setVisible(false));
+
+    // Debugging: Check if root has children
+    System.out.println("Root children: " + root.getChildren().size());
+
+    // Debugging: Check controlBox bounds
+    controlBox.boundsInParentProperty().addListener((observable, oldValue, newValue) -> {
+        System.out.println("ControlBox bounds: " + newValue);
+    });
+
+
+  Scene scene = new Scene(root, 1200, 675, Color.BLACK);
+  primaryStage.setTitle("vlcj JavaFX");
+  primaryStage.setScene(scene);
+  primaryStage.show();
     }
 
     @Override
